@@ -1,0 +1,97 @@
+_________________________________________________________________________________________________
+_________________________________________________________________________________________________
+
+------PTD-----------------------------------------------------------------
+typedef enum {
+    EVENTO_JUGADA_VALIDA = 0,                         //Asocio números con cada etiqueta asi después es mas fácil.
+    EVENTO_JUGADA_INVALIDA, 
+    EVENTO_CAMBIO_TURNO,    
+    EVENTO_VICTORIA,        
+    EVENTO_EMPATE
+} EventoSonido_t;
+------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+------------while-------------------------------------------------------------------------------------------------
+if (buzzer_encendido == 1) {
+          if (__HAL_TIM_GET_COUNTER(&htim4) >= tiempo_apagado) {                  
+              HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0, GPIO_PIN_RESET);
+              buzzer_encendido = 0;                                           //Verifico si el buzzer esta encendido para apagarlo
+          }
+      }
+if (jugada_realizada) {                                                       //Caso de jugada invalida
+          if (columna_llena) { 
+              notificar_sonido_juego(EVENTO_JUGADA_INVALIDA); 
+              jugada_realizada = 0;
+              continue; 
+          }
+estado_juego = verificar_victoria();                                          //Verifico si alguien ganó
+          if (estado_juego != 0) {
+              notificar_sonido_juego(EVENTO_VICTORIA); 
+              inicializar_tablero();                                         // Resetea el tablero y fuerza Jugador 1
+              estado_juego = 0;
+              jugada_realizada = 0;
+              continue;
+
+if (verificar_empate()) {                                                    // Verificar empate
+              notificar_sonido_juego(EVENTO_EMPATE);
+              inicializar_tablero();
+              jugada_realizada = 0;
+              continue;
+          }
+//Si no ocurre nada de lo de arriba el juego continua de forma normal, entonces necesito un sonido para eso
+
+notificar_sonido_juego(EVENTO_JUGADA_VALIDA);
+          
+          cambiar_jugador();                                                   // Cambio de turno
+          notificar_sonido_juego(EVENTO_CAMBIO_TURNO); 
+          jugada_realizada = 0;
+----------------------------------------------------------------------------------------------------------------------
+
+
+
+--------------------Begin 4 --------------------------------------------------------------------------------------------
+
+void sonar_buzzer(uint16_t duracion_ms) {
+    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0, GPIO_PIN_SET); // Enciendo el pin del buzzer 
+    buzzer_encendido = 1;
+    tiempo_apagado = __HAL_TIM_GET_COUNTER(&htim4) + (duracion_ms * 1000); /
+
+
+
+void notificar_sonido_juego(EventoSonido_t evento) {
+    switch (evento) {
+        case EVENTO_JUGADA_VALIDA:   
+            sonar_buzzer(MS_A_TICKS(150)); // Suena por 150 ms
+            break;
+            
+        case EVENTO_JUGADA_INVALIDA: 
+            sonar_buzzer(MS_A_TICKS(50));  // Suena por 50 ms 
+            break;
+            
+        case EVENTO_CAMBIO_TURNO:    
+            sonar_buzzer(MS_A_TICKS(15));  // Un pulso casi instantáneo de 15 ms
+            break;
+            
+        case EVENTO_VICTORIA:        
+            sonar_buzzer(MS_A_TICKS(600)); // Un tono largo de 600ms
+            break;
+            
+        case EVENTO_EMPATE:          
+            sonar_buzzer(MS_A_TICKS(400)); // Un tono de 400 ms
+            break;
+            
+        default:                     
+            break;
+    }
+}
+------------------------------------------------------------------------------------------------------------------------

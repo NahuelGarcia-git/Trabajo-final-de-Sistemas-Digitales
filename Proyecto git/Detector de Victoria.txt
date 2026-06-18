@@ -1,0 +1,57 @@
+______________________________________________________________________________________________________________________________________________________________
+Necesito que me devuelva un valor (jugador 1 ganó, jugador 2 ganó o no ganó nadie) =>   int . . . void
+Para ganar necesito conectar 3 seguidas, entonces el programa se para en una columna cualquiera y revisa si las dos siguientes son iguales.
+Como tengo 4 columnas, si me paro en las columnas 0 y 1 no hay problema pero si me paro en la tercera columna no me queda espacio hacia la derecha. (columa-2)
+______________________________________________________________________________________________________________________________________________________________
+
+
+
+int verificar_victoria(void) {
+    
+    // --- HORIZONTAL (3 seguidas) ---
+
+    for (int f = 0; f < FILAS; f++) {                                  // Recorre las 8 filas
+        for (int c = 0; c < COLUMNAS - 2; c++) {                       
+            if (tablero[f][c] != 0 && 
+                tablero[f][c] == tablero[f][c+1] && 
+                tablero[f][c] == tablero[f][c+2]) {
+                return tablero[f][c];                                  // Devuelve el numero que hay en la casilla
+            }
+        }
+    }
+
+    // ---  VERTICAL (3 seguidas) ---
+    for (int c = 0; c < COLUMNAS; c++) {                              // Recorre las 4 columnas
+        for (int f = 0; f < FILAS - 2; f++) {                        
+            if (tablero[f][c] != 0 && 
+                tablero[f][c] == tablero[f+1][c] && 
+                tablero[f][c] == tablero[f+2][c]) {
+                return tablero[f][c];                                // Devuelve el numero que hay en la casilla
+            }
+        }
+    }
+
+    // ---DIAGONAL HACIA ABAJO---
+    for (int f = 0; f < FILAS - 2; f++) { 
+        for (int c = 0; c < COLUMNAS - 2; c++) { 
+            if (tablero[f][c] != 0 && 
+                tablero[f][c] == tablero[f+1][c+1] && 
+                tablero[f][c] == tablero[f+2][c+2]) {
+                return tablero[f][c];
+            }
+        }
+    }
+
+    // ---  DIAGONAL HACIA ARRIBA ---
+    for (int f = 2; f < FILAS; f++) { 
+        for (int c = 0; c < COLUMNAS - 2; c++) { 
+            if (tablero[f][c] != 0 && 
+                tablero[f][c] == tablero[f-1][c+1] && 
+                tablero[f][c] == tablero[f-2][c+2]) {
+                return tablero[f][c];
+            }
+        }
+    }
+
+    return 0; // No ganó nadie
+}

@@ -1,0 +1,15 @@
+________________________________________________________________________________________________________
+Tengo que darle un estado inicial al tablero y alguno de los dos jugadores tiene que empezar el juego.
+No me tiene que devolver un valor, solo setear el tablero =>     void .... void
+Declaro una variable para usarla como contador pero solo sirve en este bucle.
+________________________________________________________________________________________________________
+
+void inicializar_tablero(void) {
+  
+    for (int f = 0; f < FILAS; f++) {           // Recorro cada fila
+       
+        for (int c = 0; c < COLUMNAS; c++) {    //Para cada fila que recorro, recorro las 4 columnas
+            tablero[f][c] = 0;                  //Asigno el estado inicial que es "vacio"
+        }
+    }
+    jugador_actual = 1;                         // Fuerzo que el jugador inicial sea el 1.

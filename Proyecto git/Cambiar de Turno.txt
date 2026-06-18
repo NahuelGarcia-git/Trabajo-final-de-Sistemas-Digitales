@@ -1,0 +1,9 @@
+
+
+void cambiar_jugador(void) {
+    if (jugador_actual == 1) {   
+        jugador_actual = 2;
+    } else {
+        jugador_actual = 1;
+    }
+}
