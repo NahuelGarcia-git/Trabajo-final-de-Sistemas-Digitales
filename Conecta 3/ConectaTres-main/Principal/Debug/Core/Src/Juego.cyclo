@@ -1,0 +1,5 @@
+../Core/Src/Juego.c:18:6:TurnoJugador1	4
+../Core/Src/Juego.c:38:6:TurnoJugador2	1
+../Core/Src/Juego.c:41:6:TurnoCPU	1
+../Core/Src/Juego.c:45:6:Gravedad	1
+../Core/Src/Juego.c:49:6:Ganador	1

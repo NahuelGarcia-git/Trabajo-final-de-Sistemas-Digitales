@@ -1,0 +1,7 @@
+../Core/Src/ws2812b.c:24:6:WS2812_LED_N_Color	16	static
+../Core/Src/ws2812b.c:42:9:Gamma_correccion	40	static
+../Core/Src/ws2812b.c:65:6:WS2812_Arma_trama	24	static
+../Core/Src/ws2812b.c:112:6:WS2812_Manda_Trama	8	static
+../Core/Src/ws2812b.c:119:6:WS2812_RESET	16	static
+../Core/Src/ws2812b.c:133:9:ws2812_rainbown_izq	32	static
+../Core/Src/ws2812b.c:168:10:ws2812_rainbown_der	32	static
