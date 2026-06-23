@@ -10,9 +10,10 @@
 #include "Teclado.h"
 #include "main.h"
 #include "stdint.h"
+#include <stdlib.h>  // Librería obligatoria para usar rand
 //---------------------------------------------------------------------------------------------------
-#define FILAS 8;
-#define COLUMNAS 4;
+#define FILAS 8
+#define COLUMNAS 4
 uint8_t columna[4] = { 31, 27, 23, 19 };   //Vector que toma los valores de los leds que estan mas altos
 static int tecla = 0;
 static int i = 0;
@@ -36,6 +37,10 @@ static int tablero[8][4] = {0};  //0=vacio  1=jugado1    2=jugador2
 //-----------------------------------------------------------------------------------------------
 static int resultado = 0;
 //-----------------------------------------------------------------------------------------------
+static int powerup_disponible_j1 = 1; // 1 = Puede usarla, 0 = Ya la gastó
+static int powerup_disponible_j2 = 1;
+static int powerup_activado = 0;
+//------------------------------------------------------------------------------------------------
 
 static void cambiar_jugador(void)
 {
@@ -53,6 +58,7 @@ void SeleccionarColumna(void)  //Arranca con el jugador 1
 		uint8_t r = (jugador_actual == 1) ? 50 : 0;  // Si jugador_actual=1 le asigno 50 a r
 		uint8_t b = (jugador_actual == 2) ? 50 : 0;
 		uint8_t g = 0;
+		powerup_activado = 0;
 		do {
 			Barrido();
 			tecla = ObtenerTecla();
@@ -69,9 +75,28 @@ void SeleccionarColumna(void)  //Arranca con el jugador 1
 							if (indice_columna > 0) {
 								indice_columna--;}
 			        break;
+			case (5):
+		            if ((jugador_actual == 1 && powerup_disponible_j1 == 1) || (jugador_actual == 2 && powerup_disponible_j2 == 1)) {
+		                    powerup_activado = 1; // Encendemos el modo especial
+		                    r = 50;
+		                    g = 50;
+		                    b = 0;
+		              //Aprieto el 5 y prende de amarillo el led, estoy en el estado de powerup;
+		                }
+					break;
 
 			case (8):
-			        jugada_confirmada = 1;
+		            if (powerup_activado == 1) {
+		               powerup();
+		                    if (jugador_actual == 1) powerup_disponible_j1 = 0;    //Resto el powerup a cada uno
+		                    if (jugador_actual == 2) powerup_disponible_j2 = 0;
+		                }
+		                else {
+		                    // Si el modo powerup no lo uso, guardo de forma normal en el tablero.
+		                    tablero[fila_destino][indice_columna] = jugador_actual;
+		                }
+
+		                jugada_confirmada = 1;
 			        break;
 			default:
 			break;
@@ -116,13 +141,9 @@ void Gravedad (void){
 int verificar_victoria(void) {
 
     // --- HORIZONTAL (3 seguidas) ---
-	int f = 0;
-	int c = 0;
-	int j=2;
-	int resultado = 0;
 
-    for (f < FILAS; f++) {                                  // Recorre las 8 filas
-        for (c < COLUMNAS - 2; c++) {
+    for (int f = 0;f < FILAS; f++) {                                  // Recorre las 8 filas
+        for (int c = 0; < (COLUMNAS - 2); c++) {
             if (tablero[f][c] != 0 &&
                 tablero[f][c] == tablero[f][c+1] &&
                 tablero[f][c] == tablero[f][c+2]) {
@@ -133,8 +154,8 @@ int verificar_victoria(void) {
     }
 
     // ---  VERTICAL (3 seguidas) ---
-    for ( c < COLUMNAS; c++) {                              // Recorre las 4 columnas
-        for ( f < FILAS - 2; f++) {
+    for ( int c = 0; < COLUMNAS; c++) {                              // Recorre las 4 columnas
+        for (int f = 0; f < (FILAS - 2); f++) {
             if (tablero[f][c] != 0 &&
                 tablero[f][c] == tablero[f+1][c] &&
                 tablero[f][c] == tablero[f+2][c]) {
@@ -145,8 +166,8 @@ int verificar_victoria(void) {
     }
 
     // ---DIAGONAL HACIA ABAJO---
-    for (f < FILAS - 2; f++) {
-        for ( c < COLUMNAS - 2; c++) {
+    for (int f = 0;f < (FILAS - 2); f++) {
+        for (int c = 0; c < (COLUMNAS - 2); c++) {
             if (tablero[f][c] != 0 &&
                 tablero[f][c] == tablero[f+1][c+1] &&
                 tablero[f][c] == tablero[f+2][c+2]) {
@@ -157,13 +178,13 @@ int verificar_victoria(void) {
     }
 
     // ---  DIAGONAL HACIA ARRIBA ---
-    for (j < FILAS; j++) {
-        for ( c < COLUMNAS - 2; c++) {
+    for (int j=2;j < FILAS; j++) {
+        for ( int c = 0 < (COLUMNAS - 2); c++) {
             if (tablero[j][c] != 0 &&
                 tablero[j][c] == tablero[j-1][c+1] &&
                 tablero[j][c] == tablero[j-2][c+2]) {
                 return tablero[j][c];
-                resultado = tablero[f][c];
+                resultado = tablero[j][c];
             }
         }
     }
@@ -263,3 +284,77 @@ void animacion_victoria (int resultado){
 	}
 
 }
+
+void juega_CPU(void){
+	jugada_confirmada=0;
+
+	while(jugada_confirmada==0){    //Si la jugada no está confirmada que busque un lugar vacio
+		indice_columna = rand() % 4; //Elijo una columna al azar
+		if (tablero[7][indice_columna] == 0) {
+		            jugada_confirmada = 1;
+		        }
+		    }
+	Gravedad();
+	}
+
+
+void powerup (void){
+	int f, c;
+	fila_destino=0;
+	for (f = (fila_destino - 1); f <= (fila_destino + 1); f++) {
+	        for (c = (indice_columna - 1); c <= (indice_columna + 1); c++) {
+	            if (f >= 0 && f < 8 && c >= 0 && c < 4) {
+
+	                tablero[f][c] = 0; // Borro la información en la matriz lógica
+
+	                WS2812_LED_N_Color(TABLERO_LEDS[f][c], 0, 0, 0); //Borro los leds
+	            }
+	        }
+	    }
+	    WS2812_Manda_Trama();
+	    int columna_original = indice_columna; //Columna donde tiró el jugador
+
+	        for (c = 0; c < COLUMNAS; c++) { //Recorro cada columna y aplico gravedad a cada una
+	            indice_columna = c;
+	            Gravedad();
+	            Gravedad();
+	            Gravedad();
+	            Gravedad();
+	            Gravedad();
+	            Gravedad();
+	            Gravedad();
+	        }
+
+	        indice_columna = columna_original;
+	    }
+
+}
+
+
+
+
+/*
+while (1) {
+
+    if (jugador_actual == 1) {
+
+        SeleccionarColumna();
+    }
+    else {
+        //Turno del jugador 2 o del cpu
+        Juega_CPU();
+        HAL_Delay(500);
+    }
+
+
+    Gravedad();
+
+
+    if (resultado != 0) {
+        animacion_ganador(resultado);
+        HAL_DELAY(500);
+        reiniciar_juego();
+    }
+}
+ */
+
